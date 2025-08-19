@@ -1,9 +1,9 @@
 import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import static java.lang.Math.round;
 
 public class Main {
     public static void main(String[] args) {
@@ -11,6 +11,8 @@ public class Main {
         String path = new Scanner(System.in).nextLine();
 //        String path = "C:\\Users\\HomeLaptop\\Downloads\\access.log";
         File file = new File(path);
+        List<LogEntry> logLines = new ArrayList<>(191076);
+        Statistics stat = new Statistics();
 
         boolean fileExists = file.exists();
         if (!fileExists) {
@@ -34,21 +36,26 @@ public class Main {
                     throw new LongLineException(
                             "Строка №" + (totalLines + 1) + " превышает 1024 символа");
                 }
+                logLines.add(new LogEntry(line));
+
                 String botFinder = userAgentFinder(line);
                 if (botFinder.equals("Googlebot")) GoogleBotCounter++;
                 if (botFinder.equals("YandexBot")) YandexBotCounter++;
                 totalLines++;
             }
-            System.out.println("Общее количество строк в файле = " + totalLines);
-            System.out.println("Доля запросов от YandexBot = " + round((double) YandexBotCounter / totalLines * 100) + "%");
-            System.out.println("Доля запросов от Googlebot = " + round((double) GoogleBotCounter / totalLines * 100) + "%");
-        } catch (FileNotFoundException ex) {
-            System.out.println("Файл не найден: " + ex);
-        } catch (IOException ex) {
-            System.out.println("Ошибка чтения файла" + ex);
-        } catch (LongLineException ex) {
+        } catch (Exception ex) {
             System.out.println("Ошибка: " + ex.getMessage());
         }
+
+        for (LogEntry logEntry : logLines) {
+            stat.addEntry(logEntry);
+        }
+        System.out.println("Статистика:" + stat);
+        System.out.println("Объем часового трафика = " + stat.getTrafficRate());
+
+//        String test = "72.118.143.231 - - [25/Sep/2022:06:25:06 +0300] \"GET /parliament/november-reports/content/6377/58/?n=13 HTTP/1.0\" 200 8983 \"-\" \"Mozilla/5.0 (Linux; Android 6.0.1; Nexus 5X Build/MMB29P) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/105.0.5195.125 Mobile Safari/537.36 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)\"";
+//        String test2 = "44.135.240.229 - - [25/Sep/2022:06:25:08 +0300] \"GET /housekeeping/?lg=2&p=506&rss=1&t=2 HTTP/1.0\" 200 1368 \"https://rosinform.ru/rubric/top/maks2015/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36 Edge/18.18362\"";
+
     }
 
     public static String userAgentFinder(String logLine) {
