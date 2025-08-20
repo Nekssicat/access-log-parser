@@ -9,6 +9,8 @@ public class Statistics {
     LocalDateTime maxTime;
     HashSet<String> pages;
     HashMap<String, Integer> osStat;
+    HashSet<String> nonExistPages;
+    HashMap<String, Integer> browserStat;
 
 
     public Statistics() {
@@ -17,12 +19,15 @@ public class Statistics {
         this.totalTraffic = 0;
         this.pages = new HashSet<>();
         this.osStat = new HashMap<>();
+        this.nonExistPages = new HashSet<>();
+        this.browserStat = new HashMap<>();
     }
 
     public void addEntry(LogEntry logEntry) {
         this.totalTraffic += logEntry.getResponseSize();
         LocalDateTime logEntryTime = logEntry.getTime();
         String userAgentOs = logEntry.userAgent.getOs();
+        String userAgentBrowser = logEntry.userAgent.getBrowser();
 
         if (this.minTime == null || logEntryTime.isBefore(this.minTime)) {
             this.minTime = logEntryTime;
@@ -32,11 +37,18 @@ public class Statistics {
         }
         if (logEntry.getResponseCode() == 200) {
             this.pages.add(logEntry.getRefer());
+        } else if (logEntry.getResponseCode() == 404) {
+            this.nonExistPages.add(logEntry.getRefer());
         }
         if (osStat.get(userAgentOs) == null) {
             osStat.put(userAgentOs, 1);
         } else {
             osStat.put(userAgentOs, osStat.get(userAgentOs) + 1);
+        }
+        if (browserStat.get(userAgentBrowser) == null) {
+            browserStat.put(userAgentBrowser, 1);
+        } else {
+            browserStat.put(userAgentBrowser, browserStat.get(userAgentBrowser) + 1);
         }
     }
 
@@ -71,6 +83,10 @@ public class Statistics {
         return pages;
     }
 
+    public HashSet<String> getNonExistPages() {
+        return nonExistPages;
+    }
+
     public HashMap<String, Double> getOsStat() {
         HashMap<String, Double> osResult = new HashMap<>();
         int totalCount = 0;
@@ -82,5 +98,18 @@ public class Statistics {
             osResult.put(os.getKey(), Math.round(ratio * 1000.0) / 1000.0);
         }
         return osResult;
+    }
+
+    public HashMap<String, Double> getBrowserStat() {
+        HashMap<String, Double> browserResult = new HashMap<>();
+        int totalCount = 0;
+        for (int count : browserStat.values()) {
+            totalCount += count;
+        }
+        for (HashMap.Entry<String, Integer> browser : browserStat.entrySet()) {
+            double ratio = (double) browser.getValue() / totalCount;
+            browserResult.put(browser.getKey(), Math.round(ratio * 1000.0) / 1000.0);
+        }
+        return browserResult;
     }
 }

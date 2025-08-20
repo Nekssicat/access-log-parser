@@ -26,18 +26,18 @@ public class UserAgent {
 
     private String parseBrowser(String userAgent) {
         String upperTxt = userAgent.toUpperCase();
-        if (upperTxt.contains("FIREFOX")) {
+        if (upperTxt.contains("FIREFOX/")) {
             return "Firefox";
-        } else if (upperTxt.contains("CHROME")) {
+        } else if (upperTxt.contains("CHROME/")) {
             return "Chrome";
-        } else if (upperTxt.contains("OPERA")) {
+        } else if (upperTxt.contains("OPR/") || upperTxt.contains("OPERA/")) {
             return "Opera";
-        } else if (upperTxt.contains("EDGE")) {
+        } else if (upperTxt.contains("EDG/")) {
             return "Edge";
-        } else if (upperTxt.contains("SAFARI")) {
+        } else if (upperTxt.contains("SAFARI/")) {
             return "Safari";
         } else {
-            return "-";
+            return "Остальные";
         }
     }
 
