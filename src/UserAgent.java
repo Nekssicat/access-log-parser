@@ -20,7 +20,7 @@ public class UserAgent {
         } else if (upperTxt.contains("IPHONE")) {
             return "iPhone";
         } else {
-            return "-";
+            return "Остальные";
         }
     }
 
