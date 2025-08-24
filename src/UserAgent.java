@@ -1,10 +1,12 @@
 public class UserAgent {
     final String os;
     final String browser;
+    boolean isBot;
 
     public UserAgent(String userAgent) {
         this.os = parseOsType(userAgent);
         this.browser = parseBrowser(userAgent);
+        this.isBot = parseBot(userAgent);
     }
 
     private String parseOsType(String userAgent) {
@@ -41,12 +43,21 @@ public class UserAgent {
         }
     }
 
+    private boolean parseBot(String userAgent) {
+        String upperTxt = userAgent.toUpperCase();
+        return upperTxt.contains("BOT");
+    }
+
     public String getOs() {
         return os;
     }
 
     public String getBrowser() {
         return browser;
+    }
+
+    public boolean isBot() {
+        return isBot;
     }
 
     @Override

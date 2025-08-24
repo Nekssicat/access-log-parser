@@ -56,6 +56,9 @@ public class Main {
         System.out.println("Несуществующие страницы:" + stat.getNonExistPages());
         System.out.println("Статистика ОС: " + stat.getOsStat());
         System.out.println("Статистика бразеров: " + stat.getBrowserStat());
+        System.out.println("Статистика среднего количества посещений сайта за час: " + stat.getAverageHumanTraffic());
+        System.out.println("Статистика среднего количества ошибочных запросов в час: " + stat.getAverageErrorTraffic());
+        System.out.println("Статистика средней посещаемости одним пользователем: " + stat.getAverageUniqueHumanTraffic());
 
 //        String test = "72.118.143.231 - - [25/Sep/2022:06:25:06 +0300] \"GET /parliament/november-reports/content/6377/58/?n=13 HTTP/1.0\" 200 8983 \"-\" \"Mozilla/5.0 (Linux; Android 6.0.1; Nexus 5X Build/MMB29P) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/105.0.5195.125 Mobile Safari/537.36 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)\"";
 //        String test2 = "44.135.240.229 - - [25/Sep/2022:06:25:08 +0300] \"GET /housekeeping/?lg=2&p=506&rss=1&t=2 HTTP/1.0\" 200 1368 \"https://rosinform.ru/rubric/top/maks2015/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36 Edge/18.18362\"";

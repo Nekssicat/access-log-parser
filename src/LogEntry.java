@@ -53,10 +53,6 @@ public class LogEntry {
         return time;
     }
 
-    public HttpMethod getMethod() {
-        return method;
-    }
-
     public int getResponseCode() {
         return responseCode;
     }
@@ -67,10 +63,6 @@ public class LogEntry {
 
     public String getRefer() {
         return refer;
-    }
-
-    public UserAgent getUserAgent() {
-        return userAgent;
     }
 
     @Override
