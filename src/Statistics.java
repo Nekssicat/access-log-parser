@@ -1,8 +1,12 @@
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.stream.Collectors;
 
 public class Statistics {
     long totalTraffic;
@@ -15,7 +19,10 @@ public class Statistics {
     HashMap<String, Integer> browserStat;
     ArrayList<Boolean> isBotList;
     long errorResponseCount;
-    HashSet<String> humanIP;
+    HashSet<String> personIPs;
+    HashMap<Long, Integer> trafficPerSecondStat;
+    HashSet<String> sites;
+    HashMap<String, Integer> trafficPersonStat;
 
 
     public Statistics() {
@@ -29,7 +36,10 @@ public class Statistics {
         this.browserStat = new HashMap<>();
         this.isBotList = new ArrayList<>();
         this.errorResponseCount = 0;
-        this.humanIP = new HashSet<>();
+        this.personIPs = new HashSet<>();
+        this.trafficPerSecondStat = new HashMap<>();
+        this.sites = new HashSet<>();
+        this.trafficPersonStat = new HashMap<>();
     }
 
     public void addEntry(LogEntry logEntry) {
@@ -77,8 +87,17 @@ public class Statistics {
         }
 
         if (!logEntry.userAgent.isBot()) {
-            humanIP.add(logEntry.getIpAddr());
+            personIPs.add(logEntry.getIpAddr());
+
+            trafficPersonStat.merge(logEntry.getIpAddr(), 1, Integer::sum);
+
+            if (trafficPerSecondStat.get(logEntryTime.toEpochSecond(ZoneOffset.UTC)) == null) {
+                trafficPerSecondStat.put(logEntryTime.toEpochSecond(ZoneOffset.UTC), 1);
+            } else {
+                trafficPerSecondStat.put(logEntryTime.toEpochSecond(ZoneOffset.UTC), trafficPerSecondStat.get(logEntryTime.toEpochSecond(ZoneOffset.UTC)) + 1);
+            }
         }
+        sites.add(logEntry.getRefer());
     }
 
     public long getTrafficRate() {
@@ -130,23 +149,75 @@ public class Statistics {
         return browserResult;
     }
 
-    public double getAverageHumanTraffic() {
-        long humanVisits = isBotList.stream()
+    public double getAveragePersonTraffic() {
+        long personTraffic = isBotList.stream()
                 .filter((Boolean isBot) -> !isBot)
                 .count();
-        return threeDecimalRound((double) humanVisits / hours);
+        return threeDecimalRound((double) personTraffic / hours);
     }
 
     public double getAverageErrorTraffic() {
         return threeDecimalRound((double) errorResponseCount / hours);
     }
 
-    public double getAverageUniqueHumanTraffic() {
-        long uniqueHumanCount = humanIP.stream().count();
-        long humanVisitsCount = isBotList.stream()
+    public double getAverageUniquePersonTraffic() {
+        long uniquePersonCount = personIPs.stream().count();
+        long personTrafficCount = isBotList.stream()
                 .filter((Boolean isBot) -> !isBot)
                 .count();
-        return threeDecimalRound((double) uniqueHumanCount / humanVisitsCount);
+        return threeDecimalRound((double) uniquePersonCount / personTrafficCount);
     }
+
+    public HashMap<Long, Integer> getTrafficPerSecondStat() {
+        return trafficPerSecondStat;
+    }
+
+    public HashMap<Long, Integer> getMaxTrafficPerSecond() {
+        HashMap<Long, Integer> res = new HashMap<>();
+
+        int maxValue = trafficPerSecondStat.values().stream()
+                .mapToInt(x -> x.intValue())
+                .max()
+                .orElse(0);
+
+        trafficPerSecondStat.entrySet().stream()
+                .filter(pair -> pair.getValue() == maxValue)
+                .forEach(pair -> res.put(pair.getKey(), pair.getValue()));
+        return res;
+    }
+
+    public HashSet<String> getDomains() {
+        return sites.stream()
+                .map(link -> this.extractDomain(link))
+                .filter(domain -> domain != null && !domain.isEmpty())
+                .collect(Collectors.toCollection(HashSet::new));
+    }
+
+    private String extractDomain(String link) {
+        link = URLDecoder.decode(link, StandardCharsets.UTF_8);
+        if (link == null || link.isEmpty() || link.equals("-")) {
+            return null;
+        }
+        return link.replaceFirst("^(https?://)?(www\\.)?", "")
+                .replaceFirst("/.*$", "")
+                .replaceFirst("\\?.*$", "")
+                .replaceFirst(":#.*$", "")
+                .trim();
+    }
+
+    public HashMap<String, Integer> getMaxPersonTraffic() {
+        HashMap<String, Integer> res = new HashMap<>();
+
+        int max = trafficPersonStat.values().stream()
+                .mapToInt(x -> x.intValue())
+                .max()
+                .orElse(0);
+
+        trafficPersonStat.entrySet().stream()
+                .filter(pair -> pair.getValue() == max)
+                .forEach(pair -> res.put(pair.getKey(), pair.getValue()));
+        return res;
+    }
+
 
 }

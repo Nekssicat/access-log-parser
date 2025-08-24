@@ -1,6 +1,5 @@
 import java.io.*;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -11,7 +10,7 @@ public class Main {
 //        String path = new Scanner(System.in).nextLine();
         String path = "C:\\Users\\HomeLaptop\\Downloads\\access.log";
         File file = new File(path);
-        List<LogEntry> logLines = new ArrayList<>(191076);
+        ArrayList<LogEntry> logLines = new ArrayList<>(191076);
         Statistics stat = new Statistics();
 
         boolean fileExists = file.exists();
@@ -50,19 +49,22 @@ public class Main {
         for (LogEntry logEntry : logLines) {
             stat.addEntry(logEntry);
         }
-        System.out.println("Статистика:" + stat);
+        System.out.println("Статистика времени:" + stat);
         System.out.println("Объем часового трафика = " + stat.getTrafficRate());
-        System.out.println("Страницы:" + stat.getPages());
-        System.out.println("Несуществующие страницы:" + stat.getNonExistPages());
+//        System.out.println("Страницы:" + stat.getPages());
+//        System.out.println("Несуществующие страницы:" + stat.getNonExistPages());
         System.out.println("Статистика ОС: " + stat.getOsStat());
         System.out.println("Статистика бразеров: " + stat.getBrowserStat());
-        System.out.println("Статистика среднего количества посещений сайта за час: " + stat.getAverageHumanTraffic());
+        System.out.println("Статистика среднего количества посещений сайта за час: " + stat.getAveragePersonTraffic());
         System.out.println("Статистика среднего количества ошибочных запросов в час: " + stat.getAverageErrorTraffic());
-        System.out.println("Статистика средней посещаемости одним пользователем: " + stat.getAverageUniqueHumanTraffic());
+        System.out.println("Статистика средней посещаемости одним пользователем: " + stat.getAverageUniquePersonTraffic());
+        System.out.println("Пиковая посещаемость сайта (в секунду): " + stat.getMaxTrafficPerSecond());
+        System.out.println("Список сайтов, со страниц которых есть ссылки на текущий сайт: " + stat.getDomains());
+        System.out.println("Максимальнаяой посещаемость одним пользователем: " + stat.getMaxPersonTraffic());
 
 //        String test = "72.118.143.231 - - [25/Sep/2022:06:25:06 +0300] \"GET /parliament/november-reports/content/6377/58/?n=13 HTTP/1.0\" 200 8983 \"-\" \"Mozilla/5.0 (Linux; Android 6.0.1; Nexus 5X Build/MMB29P) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/105.0.5195.125 Mobile Safari/537.36 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)\"";
 //        String test2 = "44.135.240.229 - - [25/Sep/2022:06:25:08 +0300] \"GET /housekeeping/?lg=2&p=506&rss=1&t=2 HTTP/1.0\" 200 1368 \"https://rosinform.ru/rubric/top/maks2015/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36 Edge/18.18362\"";
-
+//        String test3 = "10.142.178.73 - - [25/Sep/2022:06:25:04 +0300] \"GET /data.php?rss=1&json=1&lg=1 HTTP/1.0\" 200 49161 \"-\" \"-\"";
     }
 
     public static String userAgentFinder(String logLine) {

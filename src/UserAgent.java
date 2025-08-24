@@ -64,7 +64,7 @@ public class UserAgent {
     public String toString() {
         return "UserAgent{" +
                 "ОС='" + os + '\'' +
-                ", браузер='" + browser + '\'' +
+                ", браузер='" + browser + '\'' + "isBot=" + isBot +
                 '}';
     }
 }
